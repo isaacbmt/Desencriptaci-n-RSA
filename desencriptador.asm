@@ -11,13 +11,13 @@ global _main
     filename    db 'isaac3000.txt', 0
     
     enc_img:
-    incbin '0.txt', 0, 30
+    incbin '0.txt'
     enc_img_end    db 0
     
     section .bss
     num_d   resb 10
     num_n   resb 10
-    img     resb 1000
+    img     resb 1500000
     
     section .text
 _main:
@@ -87,11 +87,6 @@ LSB:
     mov eax, ecx    ;entero a convertir
     mov esi, 10     ;n = 10
     call itoa       ;str(int eax)
-    
-    push ecx
-    push dword format
-    call _printf
-    add esp, 8
     
     xor edx, edx
     xor eax, eax
@@ -200,8 +195,22 @@ itoa:   ;ecx = str(int eax)
     add eax, 48
     call save_char
     pop eax
-    sub eax, ecx    ;num - MSB(num)
     
+    mov edx, eax
+    sub eax, ecx    ;num - MSB(num)
+
+    cmp edx, 99
+    jl itoa_aux
+    
+    cmp eax, 9
+    jg itoa_aux
+    
+    push eax    
+    mov eax, 48
+    call save_char
+    imul ecx, esi
+    pop eax
+itoa_aux:
     cmp eax, 9      ;eax > 9? hace otra iteracion : sigue
     jg  itoa
     
@@ -216,23 +225,13 @@ get_msb: ;edx = get_masb(eax)
     call division   ;eax = eax // 10
     
     push eax        
-    mov eax, ecx   
-    mul esi         
-    mov ecx, eax    
+    imul ecx, esi         
     pop eax         
     
     cmp eax, 9      ;eax > 9? hace otra iteracion : sigue
     jg  get_msb
-    
-    push eax
-    mov eax, ecx
-    call division
-    pop eax
-    
-    mov edx, eax
-    mul ecx
-    mov ecx, eax
-    mov eax, edx
+
+    imul ecx, eax
     ret
     
 save_char:
@@ -262,11 +261,11 @@ write_file:
     mov dword [ebp - 4], eax;guarda el file handle
     
     ;BOOL WriteFile(hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped);
-    sub  ecx, img
+    
     lea ebx, [ebp - 8]      ;Numero de bytes escritos
     push dword 0
     push ebx
-    push dword 50                ;Largo del mensaje
+    push dword 1206000            ;Largo del mensaje
     push dword img          ;La direccion del mensaje
     push dword [ebp - 4]    ;El file handle que se va a usar para escribir al archivo
     call _WriteFile@20
@@ -278,6 +277,7 @@ write_file:
     ret
 finish:   
     call write_file
+    
     xor eax, eax
     pop ebx
     push dword 0
