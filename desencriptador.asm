@@ -22,12 +22,12 @@ global _main
     section .text
 _main:
     mov ebp, esp    ; for correct debugging
-    
-    mov eax, 3163
-    mov [num_d], eax
-    mov eax, 3599
-    mov [num_n], eax
-    ;call storeNandD ;guarda los argumentos en num_d y num_n
+    push ebx
+    ;mov eax, 3163
+    ;mov [num_d], eax
+    ;mov eax, 3599
+    ;mov [num_n], eax
+    call storeNandD ;guarda los argumentos en num_d y num_n
 
     lea edi, [enc_img]      ;Direccion del primer byte del mensaje encriptado
     lea ebx, [img]          ;Direccion del primer byte de la imagen desencriptada
@@ -106,7 +106,7 @@ storeNandD:
     push esi
     push edi
 
-    mov ebx, [dword esp + 24] ;puntero a los valores de la llave
+    mov ebx, [dword esp + 28] ;puntero a los valores de la llave
 
     push dword [ebx + 4]      ;valor de 'd'
     call _atoi
@@ -213,16 +213,21 @@ itoa:   ;ecx = str(int eax)
     ret
     
 get_msb: ;edx = get_masb(eax)
-    call division         ;eax = eax // 10
+    call division   ;eax = eax // 10
     
-    push eax
-    mov eax, ecx
-    mul esi
-    mov ecx, eax
-    pop eax
+    push eax        
+    mov eax, ecx   
+    mul esi         
+    mov ecx, eax    
+    pop eax         
     
     cmp eax, 9      ;eax > 9? hace otra iteracion : sigue
     jg  get_msb
+    
+    push eax
+    mov eax, ecx
+    call division
+    pop eax
     
     mov edx, eax
     mul ecx
@@ -274,7 +279,7 @@ write_file:
 finish:   
     call write_file
     xor eax, eax
-    
+    pop ebx
     push dword 0
     call _ExitProcess@4
     ret
