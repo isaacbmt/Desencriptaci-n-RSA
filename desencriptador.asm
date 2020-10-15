@@ -265,7 +265,7 @@ write_file:
     lea ebx, [ebp - 8]      ;Numero de bytes escritos
     push dword 0
     push ebx
-    push dword 1210000            ;Largo del mensaje
+    push dword 1500000            ;Largo del mensaje
     push dword img          ;La direccion del mensaje
     push dword [ebp - 4]    ;El file handle que se va a usar para escribir al archivo
     call _WriteFile@20
