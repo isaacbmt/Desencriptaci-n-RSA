@@ -2,6 +2,7 @@ from decoder import decode
 from tkinter import *
 from PIL import Image, ImageTk
 
+# 3163 3599
 # Ventana principal
 root = Tk()
 root.withdraw()
@@ -15,28 +16,31 @@ window.geometry('360x180')
 
 
 def image_visualizer_windows(num_d, num_n):
-    # Quita la ventana anterior
-    window.withdraw()
     # Decodifica la imagen
     decode(num_d, num_n)
+    # Quita la ventana anterior
+    window.withdraw()
     # Cambia la ventana
     visual_window = Toplevel()
-    visual_window.geometry('720x1920')
+    visual_window.title("Decodificador de imagen")
+    visual_window.geometry('880x360')
 
     labelOwo = Label(visual_window, text="Imagen codificada", font = "Helvetica 24 bold italic")
-    labelOwo.place(x=130, y=0)
-    renderOwo = ImageTk.PhotoImage(Image.open("owo.jpg"))
+    labelOwo.place(x=75, y=0)
+    img1 = Image.open("owo.png")
+    renderOwo = ImageTk.PhotoImage(img1.resize((320, 214), Image.ANTIALIAS))
     imgOwo = Label(visual_window, image=renderOwo)
     imgOwo.image = renderOwo
-    imgOwo.place(x=120, y=80)
+    imgOwo.place(x=60, y=80)
 
     labelUwu = Label(visual_window, text="Imagen decodificada", font="Helvetica 24 bold italic")
-    labelUwu.place(x=1330, y=0)
-    renderUwu = ImageTk.PhotoImage(Image.open("uwu.jpg"))
+    labelUwu.place(x=500, y=0)
+    img2 = Image.open("uwu.png")
+    renderUwu = ImageTk.PhotoImage(img2.resize((160, 214), Image.ANTIALIAS))
     imgUwu = Label(visual_window, image=renderUwu)
     imgUwu.image = renderUwu
-    imgUwu.place(x=1320, y=80)
-    
+    imgUwu.place(x=580, y=80)
+
     visual_window.mainloop()
 
 
@@ -56,7 +60,7 @@ entryN.grid(column=1, row=2, columnspan=18)
 startBtn = Button(window,
                   text="Decodificar",
                   bg='#CAF5E8',
-                  command=lambda: decode(input_d.get(),
+                  command=lambda: image_visualizer_windows(input_d.get(),
                                          input_n.get()))
 startBtn.grid(column=19, row=1, sticky=E)
 

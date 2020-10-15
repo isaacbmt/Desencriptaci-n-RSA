@@ -10,7 +10,7 @@ def get_bytes_from_file(filename):
 
 def create_image(finname, foutname, width, height):
     # Acomoda el array de la imagen
-    data = get_bytes_from_file(finname).rstrip('\x00').rstrip()
+    data = get_bytes_from_file(finname).rstrip('\x00').rstrip().lstrip()
     data = data.split(' ')
     data = list(map(int, data))
     data = numpy.array(data)
@@ -32,11 +32,11 @@ def decode(num_d, num_n):
     # Quita los caracteres no deseaados en el archivo
     fix_encode_file("0.txt")
     # Compila el desencriptador
-    os.system("nasm -fwin32 desencriptador.asm")
-    os.system("gcc desencriptador.asm -o desencriptar")
+    command = os.system("nasm -fwin32 desencriptador.asm")
+    command = os.system("gcc desencriptador.obj -o desencriptar")
     input = "desencriptar " + num_d + " " + num_n
-    os.system(input)
+    command = os.system(input)
     # Crea las imagenes
-    create_image("0.txt", "owo.png", 960, 640)
-    create_image("isaac3000.txt", "uwu.png", 480, 640)
+    create_image("0.txt", "owo.png", 640, 960)
+    create_image("isaac3000.txt", "uwu.png", 640, 480)
 
