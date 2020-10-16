@@ -6,7 +6,7 @@ global _main
     extern _CloseHandle@4
     extern _printf
     extern _atoi
-    
+
     section .data
     filename    db 'isaac3000.txt', 0
     
@@ -100,7 +100,7 @@ save_int_in_var:
     xor edx, edx
     xor eax, eax
 
-    pop ecx     ;restaura el valor de los registros
+    pop ecx         ;restaura el valor de los registros
     pop esi
     
     jmp split       ;hace la siguiente iteracion
@@ -152,26 +152,26 @@ getEncNumber:
     pop edx
 getEncNumberAux:
     add eax, ebx    ;le suma el siguiente caracter al numero
-    inc edx         ;disminuye el contador
+    inc edx         ;aumenta el contador
     
     cmp ecx, 0      ;ecx !=  0? hace otra iteracion : retorna
     jnz getEncNumberloop
     ret
 lookuptable:
-    cmp eax, [enc_values + ecx * 4]
-    jz  returnvalue
-    cmp ecx, 256
+    cmp eax, [enc_values + ecx * 4] ; numero encriptado == [direccion del lookup table + contador]?
+    jz  returnvalue                 ; retorna el numero : sigue
+    cmp ecx, 256                    ; contador == 256? Guarda el numero en memoria : sigue
     jz  savevalue
-    inc ecx
+    inc ecx                         ; contador += 1
     jmp lookuptable
 
 returnvalue:    
-    mov ecx, [dec_values + ecx * 4]
+    mov ecx, [dec_values + ecx * 4] ; guarda el numero que esta en memoria en un registro
     jmp save_int_in_var
 
 savevalue:
     mov ecx, [lookup_counter]
-    mov [enc_values + ecx * 4], eax
+    mov [enc_values + ecx * 4], eax ; guarga el numero la memoria los numeros encriptados
     jmp calc_modular_pow
     
 pow:
