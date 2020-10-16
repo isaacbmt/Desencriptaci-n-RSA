@@ -39,4 +39,3 @@ def decode(num_d, num_n):
     # Crea las imagenes
     create_image("0.txt", "owo.png", 640, 960)
     create_image("isaac3000.txt", "uwu.png", 640, 480)
-

@@ -15,20 +15,20 @@ global _main
     enc_img_end    db 0
     
     section .bss
-    num_d   resb 10
-    num_n   resb 10
-    img     resb 1500000
+    num_d           resb 4
+    num_n           resb 4
+    lookup_counter  resb 4
+    enc_values      resd 256
+    dec_values      resd 256
+    img             resb 1500000
     
     section .text
 _main:
     mov ebp, esp    ; for correct debugging
     push ebx
-    ;mov eax, 3163
-    ;mov [num_d], eax
-    ;mov eax, 3599
-    ;mov [num_n], eax
     call storeNandD ;guarda los argumentos en num_d y num_n
-
+    
+    mov [lookup_counter], dword 0
     lea edi, [enc_img]      ;Direccion del primer byte del mensaje encriptado
     lea ebx, [img]          ;Direccion del primer byte de la imagen desencriptada
     mov edx, 0              ;contador que indica si el numero es la parte LSB o MSB
@@ -74,16 +74,25 @@ LSB:
     push ecx
     push ebx
     
+    xor ecx, ecx
+    jmp lookuptable    ;ecx=contador ;ebx=direccion inicial ;eax=valor encriptado
+
+calc_modular_pow:
     mov ecx, 1      ;valor inicial del resultado
     mov esi, [num_n];guarda el valor de num_n en un registro
     mov ebx, [num_d]
+    xor edx, edx
     div esi
     mov eax, edx    ;guarda eax % esi en un registro
     call modular_pow;hace la operacion: ecx = base ^ num_d % num_n
     
+    mov eax, [lookup_counter]
+    mov [dec_values + eax * 4], ecx
+    inc dword [lookup_counter]
+    
+save_int_in_var:
     ; Escribe ecx en la variable
     pop ebx
-    
     mov eax, ecx    ;entero a convertir
     mov esi, 10     ;n = 10
     call itoa       ;str(int eax)
@@ -148,6 +157,23 @@ getEncNumberAux:
     cmp ecx, 0      ;ecx !=  0? hace otra iteracion : retorna
     jnz getEncNumberloop
     ret
+lookuptable:
+    cmp eax, [enc_values + ecx * 4]
+    jz  returnvalue
+    cmp ecx, 256
+    jz  savevalue
+    inc ecx
+    jmp lookuptable
+
+returnvalue:    
+    mov ecx, [dec_values + ecx * 4]
+    jmp save_int_in_var
+
+savevalue:
+    mov ecx, [lookup_counter]
+    mov [enc_values + ecx * 4], eax
+    jmp calc_modular_pow
+    
 pow:
     mov ecx, [esp + 8]
     mov eax, 1          ;numero neutral de la multiplicacion
@@ -248,7 +274,6 @@ division:; eax = eax // esi
     div esi
     ret
 write_file:
-    ;mov ecx, ebx
     push ebx
     push eax
     
@@ -277,7 +302,6 @@ write_file:
     ret
 finish:
     call write_file
-    
     xor eax, eax
     pop ebx
     push dword 0
